@@ -599,25 +599,6 @@ function RetailInsights() {
       {/* CAMPAIGN PERFORMANCE TAB */}
       {activeTab === 'campaign' && (
         <div className="tab-content">
-          {/* CV Toggle */}
-          <div className="cv-toggle-wrapper">
-            <label className="cv-toggle">
-              <input
-                type="checkbox"
-                checked={cvEnabled}
-                onChange={(e) => setCvEnabled(e.target.checked)}
-                aria-label="Enable Computer Vision analytics"
-              />
-              <span className="toggle-slider"></span>
-            </label>
-            <span className="cv-toggle-label">
-              Computer Vision {cvEnabled ? 'Enabled' : 'Disabled'}
-            </span>
-            {!cvEnabled && (
-              <span className="cv-hint">Enable for demographic insights</span>
-            )}
-          </div>
-
           {/* Summary Metrics */}
           <div className="metrics-grid">
             <div className="metric-card">
