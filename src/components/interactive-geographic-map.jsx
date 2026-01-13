@@ -95,15 +95,21 @@ function InteractiveGeographicMap({ data, onLocationSelect, selectedLocation }) 
           {/* State outlines */}
           <Geographies geography={AU_GEO_URL}>
             {({ geographies }) =>
-              geographies.map((geo) => (
+              geographies
+                .filter(geo => {
+                  // Only show Australia (filter out other countries)
+                  const props = geo.properties;
+                  return props && (props.ADMIN === 'Australia' || props.name === 'Australia' || geo.id === 'AUS');
+                })
+                .map((geo) => (
                 <Geography
                   key={geo.rsmKey}
                   geography={geo}
                   fill="#e5e7eb"
-                  stroke="#fff"
-                  strokeWidth={0.5}
+                  stroke="#9ca3af"
+                  strokeWidth={1}
                   style={{
-                    default: { outline: 'none' },
+                    default: { outline: 'none', fill: '#e5e7eb' },
                     hover: { fill: '#d1d5db', outline: 'none' },
                     pressed: { outline: 'none' },
                   }}
