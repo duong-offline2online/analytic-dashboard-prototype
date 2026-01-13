@@ -88,10 +88,10 @@ function InteractiveGeographicMap({ data, onLocationSelect, selectedLocation }) 
     <div className="map-container">
       <ComposableMap
         projection="geoMercator"
-        projectionConfig={{ scale: 1200, center: [133, -25] }}
+        projectionConfig={{ scale: 1500, center: [133, -27] }}
         style={{ width: '100%', height: '100%' }}
       >
-        <ZoomableGroup center={[133, -25]} zoom={1}>
+        <ZoomableGroup center={[133, -27]} zoom={1}>
           {/* State outlines */}
           <Geographies geography={AU_GEO_URL}>
             {({ geographies }) =>
