@@ -7,16 +7,16 @@ import {
   ZoomableGroup,
 } from 'react-simple-maps';
 
-// US TopoJSON from CDN
-const US_GEO_URL = 'https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json';
+// Australia TopoJSON from CDN
+const AU_GEO_URL = 'https://cdn.jsdelivr.net/npm/au-geo-toposon@1.0.0/au.json';
 
-// State centers for positioning markers
+// Australian state centers for positioning markers
 const STATE_CENTERS = {
-  CA: [-119.4179, 36.7783],
-  NY: [-75.4, 43.0],
-  TX: [-99.9018, 31.9686],
-  FL: [-81.5158, 27.6648],
-  IL: [-89.3985, 40.6331],
+  NSW: [151.2093, -33.8688],    // Sydney, New South Wales
+  VIC: [144.9631, -37.8136],    // Melbourne, Victoria
+  QLD: [153.0251, -27.4698],    // Brisbane, Queensland
+  WA: [115.8605, -31.9505],     // Perth, Western Australia
+  SA: [138.6007, -34.9285],     // Adelaide, South Australia
 };
 
 const getMarkerColor = (score) => {
@@ -87,13 +87,13 @@ function InteractiveGeographicMap({ data, onLocationSelect, selectedLocation }) 
   return (
     <div className="map-container">
       <ComposableMap
-        projection="geoAlbersUsa"
-        projectionConfig={{ scale: 1000 }}
+        projection="geoMercator"
+        projectionConfig={{ scale: 1200, center: [133, -25] }}
         style={{ width: '100%', height: '100%' }}
       >
-        <ZoomableGroup center={[-96, 38]} zoom={1}>
+        <ZoomableGroup center={[133, -25]} zoom={1}>
           {/* State outlines */}
-          <Geographies geography={US_GEO_URL}>
+          <Geographies geography={AU_GEO_URL}>
             {({ geographies }) =>
               geographies.map((geo) => (
                 <Geography
