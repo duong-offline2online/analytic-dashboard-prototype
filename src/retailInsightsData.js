@@ -176,14 +176,14 @@ export const generateRetailInsightsData = () => {
     });
   };
 
-  // Location Performance Data
+  // Location Performance Data (Australia)
   const generateLocationPerformance = () => {
     const locations = [
-      { state: 'CA', storeCount: 8, basePasser: 12500, storeIds: ['store1'], brandIds: ['brand1', 'brand2'] },
-      { state: 'NY', storeCount: 6, basePasser: 9800, storeIds: ['store2'], brandIds: ['brand2'] },
-      { state: 'TX', storeCount: 5, basePasser: 7200, storeIds: ['store3'], brandIds: ['brand3'] },
-      { state: 'FL', storeCount: 4, basePasser: 5100, storeIds: ['store4'], brandIds: ['brand2'] },
-      { state: 'IL', storeCount: 3, basePasser: 3800, storeIds: ['store5'], brandIds: ['brand1', 'brand3'] },
+      { state: 'NSW', storeCount: 8, basePasser: 12500, storeIds: ['store1'], brandIds: ['brand1', 'brand2'] },
+      { state: 'VIC', storeCount: 6, basePasser: 9800, storeIds: ['store2'], brandIds: ['brand2'] },
+      { state: 'QLD', storeCount: 5, basePasser: 7200, storeIds: ['store3'], brandIds: ['brand3'] },
+      { state: 'WA', storeCount: 4, basePasser: 5100, storeIds: ['store4'], brandIds: ['brand2'] },
+      { state: 'SA', storeCount: 3, basePasser: 3800, storeIds: ['store5'], brandIds: ['brand1', 'brand3'] },
     ];
 
     return locations.map(item => {

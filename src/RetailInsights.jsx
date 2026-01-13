@@ -827,24 +827,54 @@ function RetailInsights() {
               <table>
                 <thead>
                   <tr>
-                    <th onClick={() => handleSort('displayType')}>
-                      Display Type {sortConfig.key === 'displayType' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                    <th style={{ cursor: 'pointer' }} onClick={() => handleSort('displayType')}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                        Display Type
+                        <span style={{ fontSize: '11px', opacity: 0.6 }}>
+                          {sortConfig.key === 'displayType' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                        </span>
+                      </div>
                     </th>
                     <th>Status</th>
-                    <th onClick={() => handleSort('passersby')} style={{ cursor: 'pointer' }}>
-                      Passerby {sortConfig.key === 'passersby' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                    <th style={{ cursor: 'pointer' }} onClick={() => handleSort('passersby')}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                        Passerby
+                        <span style={{ fontSize: '11px', opacity: 0.6 }}>
+                          {sortConfig.key === 'passersby' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                        </span>
+                      </div>
                     </th>
-                    <th onClick={() => handleSort('playbackDuration')} style={{ cursor: 'pointer' }}>
-                      Playback Duration {sortConfig.key === 'playbackDuration' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                    <th style={{ cursor: 'pointer' }} onClick={() => handleSort('playbackDuration')}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                        Playback Duration
+                        <span style={{ fontSize: '11px', opacity: 0.6 }}>
+                          {sortConfig.key === 'playbackDuration' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                        </span>
+                      </div>
                     </th>
-                    <th onClick={() => handleSort('playbackCount')} style={{ cursor: 'pointer' }}>
-                      Playback Count {sortConfig.key === 'playbackCount' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                    <th style={{ cursor: 'pointer' }} onClick={() => handleSort('playbackCount')}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                        Playback Count
+                        <span style={{ fontSize: '11px', opacity: 0.6 }}>
+                          {sortConfig.key === 'playbackCount' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                        </span>
+                      </div>
                     </th>
-                    <th onClick={() => handleSort('views')} style={{ cursor: 'pointer' }}>
-                      Views {sortConfig.key === 'views' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                    <th style={{ cursor: 'pointer' }} onClick={() => handleSort('views')}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                        Views
+                        <span style={{ fontSize: '11px', opacity: 0.6 }}>
+                          {sortConfig.key === 'views' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                        </span>
+                      </div>
                     </th>
-                    <th onClick={() => handleSort('engagementScore')} style={{ cursor: 'pointer' }}>
-                      Engagement {sortConfig.key === 'engagementScore' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                    <th style={{ cursor: 'pointer' }} onClick={() => handleSort('engagementScore')}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                        Engagement
+                        <span style={{ fontSize: '11px', opacity: 0.6 }}>
+                          {sortConfig.key === 'engagementScore' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                        </span>
+                      </div>
                     </th>
                   </tr>
                 </thead>
