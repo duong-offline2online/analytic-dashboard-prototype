@@ -35,6 +35,61 @@ function RetailInsights() {
     engagement: '#8b5cf6',
   };
 
+  // Helper function to calculate filtered passerby value based on gender and age filters
+  const getFilteredPasserbyValue = (dayData) => {
+    if (genderFilter === 'all' && ageFilter === 'all') {
+      return dayData.passerby; // Return total passerby if no filters
+    }
+
+    let genderValue = 0;
+    let ageValue = 0;
+
+    // Calculate gender-filtered value
+    if (genderFilter === 'all') {
+      genderValue = dayData.passerby; // All genders
+    } else if (genderFilter === 'male') {
+      genderValue = dayData.passerbyMale;
+    } else if (genderFilter === 'female') {
+      genderValue = dayData.passerbyFemale;
+    }
+
+    // Calculate age-filtered value
+    if (ageFilter === 'all') {
+      ageValue = dayData.passerby; // All ages
+    } else if (ageFilter === '18-24') {
+      ageValue = dayData.passerby18_24;
+    } else if (ageFilter === '25-34') {
+      ageValue = dayData.passerby25_34;
+    } else if (ageFilter === '35-44') {
+      ageValue = dayData.passerby35_44;
+    } else if (ageFilter === '45-54') {
+      ageValue = dayData.passerby45_54;
+    } else if (ageFilter === '55+') {
+      ageValue = dayData.passerby55;
+    }
+
+    // If both filters are applied, return the intersection
+    // (assuming both filters apply independently)
+    if (genderFilter !== 'all' && ageFilter !== 'all') {
+      // Combine both filters - estimate intersection
+      const genderRatio = genderValue / dayData.passerby;
+      const ageRatio = ageValue / dayData.passerby;
+      return Math.floor(dayData.passerby * genderRatio * ageRatio);
+    }
+
+    // Return whichever filter is active (the one that's not 'all')
+    return genderFilter !== 'all' ? genderValue : ageValue;
+  };
+
+  // Transform visitor data to include filtered passerby values
+  const getVisitorChartData = () => {
+    if (!mockData.visitorInsights?.timeSeriesData) return [];
+    return mockData.visitorInsights.timeSeriesData.map(day => ({
+      ...day,
+      filteredPasserby: getFilteredPasserbyValue(day),
+    }));
+  };
+
   // Calculate summary from filtered display data
   const calculateSummary = (displayData) => {
     if (displayData.length === 0) {
@@ -434,7 +489,7 @@ function RetailInsights() {
             </div>
             <ResponsiveContainer width="100%" height={300}>
               {mockData.visitorInsights ? (
-                <LineChart data={mockData.visitorInsights.timeSeriesData}>
+                <LineChart data={getVisitorChartData()}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                   <XAxis dataKey="day" stroke="#6b7280" tick={{ fontSize: 12 }} />
                   <YAxis stroke="#6b7280" tick={{ fontSize: 12 }} />
@@ -467,83 +522,16 @@ function RetailInsights() {
                     dot={{ r: 4 }}
                   />
 
-                  {/* Show CV Passerby Breakdowns Based on Gender/Age Filters */}
+                  {/* Show Single Aggregated Passerby Line Based on Filters */}
                   {cvEnabled && (
-                    <>
-                      {/* Gender Filter: Show Male/Female Passerby */}
-                      {(genderFilter === 'all' || genderFilter === 'male') && (
-                        <Line
-                          type="monotone"
-                          dataKey="passerbyMale"
-                          stroke="#1d4ed8"
-                          strokeWidth={2}
-                          name="Male Passerby"
-                          dot={{ r: 4 }}
-                        />
-                      )}
-                      {(genderFilter === 'all' || genderFilter === 'female') && (
-                        <Line
-                          type="monotone"
-                          dataKey="passerbyFemale"
-                          stroke="#ec4899"
-                          strokeWidth={2}
-                          name="Female Passerby"
-                          dot={{ r: 4 }}
-                        />
-                      )}
-
-                      {/* Age Filter: Show Age Group Passerby */}
-                      {(ageFilter === 'all' || ageFilter === '18-24') && (
-                        <Line
-                          type="monotone"
-                          dataKey="passerby18_24"
-                          stroke="#dc2626"
-                          strokeWidth={1.5}
-                          name="Passerby 18-24"
-                          dot={{ r: 3 }}
-                        />
-                      )}
-                      {(ageFilter === 'all' || ageFilter === '25-34') && (
-                        <Line
-                          type="monotone"
-                          dataKey="passerby25_34"
-                          stroke="#f59e0b"
-                          strokeWidth={1.5}
-                          name="Passerby 25-34"
-                          dot={{ r: 3 }}
-                        />
-                      )}
-                      {(ageFilter === 'all' || ageFilter === '35-44') && (
-                        <Line
-                          type="monotone"
-                          dataKey="passerby35_44"
-                          stroke="#10b981"
-                          strokeWidth={1.5}
-                          name="Passerby 35-44"
-                          dot={{ r: 3 }}
-                        />
-                      )}
-                      {(ageFilter === 'all' || ageFilter === '45-54') && (
-                        <Line
-                          type="monotone"
-                          dataKey="passerby45_54"
-                          stroke="#06b6d4"
-                          strokeWidth={1.5}
-                          name="Passerby 45-54"
-                          dot={{ r: 3 }}
-                        />
-                      )}
-                      {(ageFilter === 'all' || ageFilter === '55+') && (
-                        <Line
-                          type="monotone"
-                          dataKey="passerby55"
-                          stroke="#8b5cf6"
-                          strokeWidth={1.5}
-                          name="Passerby 55+"
-                          dot={{ r: 3 }}
-                        />
-                      )}
-                    </>
+                    <Line
+                      type="monotone"
+                      dataKey="filteredPasserby"
+                      stroke="#f59e0b"
+                      strokeWidth={2}
+                      name="Passerby Audience (CV)"
+                      dot={{ r: 4 }}
+                    />
                   )}
                 </LineChart>
               ) : (
