@@ -7,8 +7,8 @@ import {
   ZoomableGroup,
 } from 'react-simple-maps';
 
-// Australia TopoJSON from CDN
-const AU_GEO_URL = 'https://cdn.jsdelivr.net/npm/au-geo-toposon@1.0.0/au.json';
+// Australia GeoJSON from CDN (mapshaper)
+const AU_GEO_URL = 'https://cdn.jsdelivr.net/npm/au-states@1/au.json';
 
 // Australian state centers for positioning markers
 const STATE_CENTERS = {

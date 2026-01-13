@@ -1275,18 +1275,9 @@
 /* Top Performer Highlight */
 .top-performer-row {
   background: linear-gradient(90deg, #fef3c7 0%, #fef9e7 100%) !important;
-  position: relative;
 }
 
-.top-performer-row::before {
-  content: "⭐";
-  position: absolute;
-  left: 4px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 18px;
-}
-
-.top-performer-row td:first-child {
-  padding-left: 28px;
+.top-performer-row td:first-child::before {
+  content: "⭐ ";
+  margin-right: 4px;
 }
