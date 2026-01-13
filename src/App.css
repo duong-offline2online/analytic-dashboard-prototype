@@ -130,9 +130,9 @@
 }
 
 .nav-item.active {
-  background-color: #3182ce;
+  background-color: #00BCD4;
   color: white;
-  border-left: 4px solid #63b3ed;
+  border-left: 4px solid #00BCD4;
 }
 
 /* Main Content */
@@ -243,8 +243,8 @@
 }
 
 .tab.active {
-  color: #0ea5e9;
-  border-bottom-color: #0ea5e9;
+  color: #00BCD4;
+  border-bottom-color: #00BCD4;
   font-weight: 500;
 }
 
@@ -273,16 +273,16 @@
 }
 
 .metric-card {
-  background: white;
+  background: #f3f4f6;
   padding: 32px 24px;
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  box-shadow: none;
   transition: all 0.2s;
   box-sizing: border-box;
   min-width: 0;
   overflow: hidden;
   text-align: center;
-  border: 1px solid #f0f0f0;
+  border: none;
 }
 
 .metric-card:hover {
@@ -744,9 +744,9 @@
 }
 
 .demo-filter-btn.active {
-  background-color: #3182ce;
+  background-color: #00BCD4;
   color: white;
-  border-color: #3182ce;
+  border-color: #00BCD4;
 }
 
 .chart-empty-state {
