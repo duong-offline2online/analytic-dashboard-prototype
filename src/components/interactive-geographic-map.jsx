@@ -7,8 +7,8 @@ import {
   ZoomableGroup,
 } from 'react-simple-maps';
 
-// Australia GeoJSON from CDN (mapshaper)
-const AU_GEO_URL = 'https://cdn.jsdelivr.net/npm/au-states@1/au.json';
+// Australia country boundary GeoJSON from natural-earth data
+const AU_GEO_URL = 'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_admin_0_countries.geojson';
 
 // Australian state centers for positioning markers
 const STATE_CENTERS = {
@@ -96,15 +96,12 @@ function InteractiveGeographicMap({ data, onLocationSelect, selectedLocation }) 
           <Geographies geography={AU_GEO_URL}>
             {({ geographies }) =>
               geographies.map((geo) => {
-                // Filter to show only Australia - check multiple property names
+                // Filter to show only Australia
                 const props = geo.properties;
                 const isAustralia = props && (
                   props.ADMIN === 'Australia' ||
-                  props.admin === 'Australia' ||
-                  props.name === 'Australia' ||
                   props.NAME === 'Australia' ||
-                  (geo.id && String(geo.id).includes('AUS')) ||
-                  !props.ADMIN // If no ADMIN property, assume it's Australia (from au-states GeoJSON)
+                  props.name === 'Australia'
                 );
 
                 if (!isAustralia) return null;
