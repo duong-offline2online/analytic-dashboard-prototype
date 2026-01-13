@@ -22,7 +22,6 @@ function RetailInsights() {
   const [genderFilter, setGenderFilter] = React.useState('all');
   const [ageFilter, setAgeFilter] = React.useState('all');
   const [cvEnabled, setCvEnabled] = React.useState(true);
-  const [passerbyViewMode, setPasserbyViewMode] = React.useState('gender'); // 'gender' or 'age'
   const [sortConfig, setSortConfig] = React.useState({ key: 'passersby', direction: 'desc' });
   const [selectedMapLocation, setSelectedMapLocation] = React.useState(null);
   const [currentPage, setCurrentPage] = React.useState(1);
@@ -374,21 +373,61 @@ function RetailInsights() {
             <div className="chart-header">
               <h3>Visitor Stats (07 Jan - 13 Jan){cvEnabled ? ' - Enhanced with CV Passerby Data' : ''}</h3>
               {cvEnabled && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <span style={{ fontSize: '13px', fontWeight: '500', color: '#6b7280' }}>Passerby Breakdown:</span>
+                <div className="demographic-filters">
                   <button
-                    className={`demo-filter-btn ${passerbyViewMode === 'gender' ? 'active' : ''}`}
-                    onClick={() => setPasserbyViewMode('gender')}
-                    style={{ fontSize: '13px' }}
+                    className={`demo-filter-btn ${genderFilter === 'all' ? 'active' : ''}`}
+                    onClick={() => setGenderFilter('all')}
                   >
-                    By Gender
+                    All
                   </button>
                   <button
-                    className={`demo-filter-btn ${passerbyViewMode === 'age' ? 'active' : ''}`}
-                    onClick={() => setPasserbyViewMode('age')}
-                    style={{ fontSize: '13px' }}
+                    className={`demo-filter-btn ${genderFilter === 'male' ? 'active' : ''}`}
+                    onClick={() => setGenderFilter('male')}
                   >
-                    By Age Range
+                    Male
+                  </button>
+                  <button
+                    className={`demo-filter-btn ${genderFilter === 'female' ? 'active' : ''}`}
+                    onClick={() => setGenderFilter('female')}
+                  >
+                    Female
+                  </button>
+                  <span style={{ margin: '0 8px', color: '#cbd5e0' }}>|</span>
+                  <button
+                    className={`demo-filter-btn ${ageFilter === 'all' ? 'active' : ''}`}
+                    onClick={() => setAgeFilter('all')}
+                  >
+                    All Ages
+                  </button>
+                  <button
+                    className={`demo-filter-btn ${ageFilter === '18-24' ? 'active' : ''}`}
+                    onClick={() => setAgeFilter('18-24')}
+                  >
+                    18-24
+                  </button>
+                  <button
+                    className={`demo-filter-btn ${ageFilter === '25-34' ? 'active' : ''}`}
+                    onClick={() => setAgeFilter('25-34')}
+                  >
+                    25-34
+                  </button>
+                  <button
+                    className={`demo-filter-btn ${ageFilter === '35-44' ? 'active' : ''}`}
+                    onClick={() => setAgeFilter('35-44')}
+                  >
+                    35-44
+                  </button>
+                  <button
+                    className={`demo-filter-btn ${ageFilter === '45-54' ? 'active' : ''}`}
+                    onClick={() => setAgeFilter('45-54')}
+                  >
+                    45-54
+                  </button>
+                  <button
+                    className={`demo-filter-btn ${ageFilter === '55+' ? 'active' : ''}`}
+                    onClick={() => setAgeFilter('55+')}
+                  >
+                    55+
                   </button>
                 </div>
               )}
@@ -428,70 +467,82 @@ function RetailInsights() {
                     dot={{ r: 4 }}
                   />
 
-                  {/* Show CV Passerby Breakdowns Only When Enabled */}
-                  {cvEnabled && passerbyViewMode === 'gender' && (
+                  {/* Show CV Passerby Breakdowns Based on Gender/Age Filters */}
+                  {cvEnabled && (
                     <>
-                      <Line
-                        type="monotone"
-                        dataKey="passerbyMale"
-                        stroke="#1d4ed8"
-                        strokeWidth={2}
-                        name="Male Passerby"
-                        dot={{ r: 4 }}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="passerbyFemale"
-                        stroke="#ec4899"
-                        strokeWidth={2}
-                        name="Female Passerby"
-                        dot={{ r: 4 }}
-                      />
-                    </>
-                  )}
+                      {/* Gender Filter: Show Male/Female Passerby */}
+                      {(genderFilter === 'all' || genderFilter === 'male') && (
+                        <Line
+                          type="monotone"
+                          dataKey="passerbyMale"
+                          stroke="#1d4ed8"
+                          strokeWidth={2}
+                          name="Male Passerby"
+                          dot={{ r: 4 }}
+                        />
+                      )}
+                      {(genderFilter === 'all' || genderFilter === 'female') && (
+                        <Line
+                          type="monotone"
+                          dataKey="passerbyFemale"
+                          stroke="#ec4899"
+                          strokeWidth={2}
+                          name="Female Passerby"
+                          dot={{ r: 4 }}
+                        />
+                      )}
 
-                  {cvEnabled && passerbyViewMode === 'age' && (
-                    <>
-                      <Line
-                        type="monotone"
-                        dataKey="passerby18_24"
-                        stroke="#dc2626"
-                        strokeWidth={1.5}
-                        name="Passerby 18-24"
-                        dot={{ r: 3 }}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="passerby25_34"
-                        stroke="#f59e0b"
-                        strokeWidth={1.5}
-                        name="Passerby 25-34"
-                        dot={{ r: 3 }}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="passerby35_44"
-                        stroke="#10b981"
-                        strokeWidth={1.5}
-                        name="Passerby 35-44"
-                        dot={{ r: 3 }}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="passerby45_54"
-                        stroke="#06b6d4"
-                        strokeWidth={1.5}
-                        name="Passerby 45-54"
-                        dot={{ r: 3 }}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="passerby55"
-                        stroke="#8b5cf6"
-                        strokeWidth={1.5}
-                        name="Passerby 55+"
-                        dot={{ r: 3 }}
-                      />
+                      {/* Age Filter: Show Age Group Passerby */}
+                      {(ageFilter === 'all' || ageFilter === '18-24') && (
+                        <Line
+                          type="monotone"
+                          dataKey="passerby18_24"
+                          stroke="#dc2626"
+                          strokeWidth={1.5}
+                          name="Passerby 18-24"
+                          dot={{ r: 3 }}
+                        />
+                      )}
+                      {(ageFilter === 'all' || ageFilter === '25-34') && (
+                        <Line
+                          type="monotone"
+                          dataKey="passerby25_34"
+                          stroke="#f59e0b"
+                          strokeWidth={1.5}
+                          name="Passerby 25-34"
+                          dot={{ r: 3 }}
+                        />
+                      )}
+                      {(ageFilter === 'all' || ageFilter === '35-44') && (
+                        <Line
+                          type="monotone"
+                          dataKey="passerby35_44"
+                          stroke="#10b981"
+                          strokeWidth={1.5}
+                          name="Passerby 35-44"
+                          dot={{ r: 3 }}
+                        />
+                      )}
+                      {(ageFilter === 'all' || ageFilter === '45-54') && (
+                        <Line
+                          type="monotone"
+                          dataKey="passerby45_54"
+                          stroke="#06b6d4"
+                          strokeWidth={1.5}
+                          name="Passerby 45-54"
+                          dot={{ r: 3 }}
+                        />
+                      )}
+                      {(ageFilter === 'all' || ageFilter === '55+') && (
+                        <Line
+                          type="monotone"
+                          dataKey="passerby55"
+                          stroke="#8b5cf6"
+                          strokeWidth={1.5}
+                          name="Passerby 55+"
+                          dot={{ r: 3 }}
+                        />
+                      )}
                     </>
                   )}
                 </LineChart>
