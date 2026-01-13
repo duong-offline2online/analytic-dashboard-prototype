@@ -94,7 +94,7 @@
   top: 60px;
   width: 240px;
   height: calc(100vh - 60px);
-  background-color: #1a202c;
+  background-color: #3a3a3a;
   color: white;
   padding: 24px 0;
   display: flex;
@@ -109,7 +109,7 @@
 }
 
 .sidebar-bottom {
-  border-top: 1px solid #2d3748;
+  border-top: 1px solid #4a4a4a;
   padding-top: 16px;
 }
 
@@ -125,7 +125,7 @@
 }
 
 .nav-item:hover {
-  background-color: #2d3748;
+  background-color: #4a4a4a;
   color: white;
 }
 
