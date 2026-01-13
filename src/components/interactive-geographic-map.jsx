@@ -58,29 +58,55 @@ const MapTooltip = ({ location }) => {
 };
 
 // Legend subcomponent
-const MapLegend = () => (
-  <div className="map-legend">
-    <div className="legend-title">Engagement Score</div>
-    <div className="legend-items">
-      <div className="legend-item">
-        <span className="legend-dot" style={{ background: '#10b981' }}></span>
-        <span>75+ (High)</span>
+const MapLegend = ({ isVisible, onToggle }) => (
+  <div className="map-legend-wrapper">
+    <button
+      className="legend-toggle-btn"
+      onClick={onToggle}
+      title={isVisible ? 'Hide legend' : 'Show legend'}
+      style={{
+        background: '#fff',
+        border: '1px solid #e5e7eb',
+        borderRadius: '6px',
+        padding: '8px 10px',
+        cursor: 'pointer',
+        fontSize: '18px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '36px',
+        height: '36px',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+      }}
+    >
+      {isVisible ? '✕' : '≡'}
+    </button>
+    {isVisible && (
+      <div className="map-legend">
+        <div className="legend-title">Engagement Score</div>
+        <div className="legend-items">
+          <div className="legend-item">
+            <span className="legend-dot" style={{ background: '#10b981' }}></span>
+            <span>75+ (High)</span>
+          </div>
+          <div className="legend-item">
+            <span className="legend-dot" style={{ background: '#f59e0b' }}></span>
+            <span>50-74 (Medium)</span>
+          </div>
+          <div className="legend-item">
+            <span className="legend-dot" style={{ background: '#ef4444' }}></span>
+            <span>&lt;50 (Low)</span>
+          </div>
+        </div>
+        <div className="legend-note">Marker size = passersby volume</div>
       </div>
-      <div className="legend-item">
-        <span className="legend-dot" style={{ background: '#f59e0b' }}></span>
-        <span>50-74 (Medium)</span>
-      </div>
-      <div className="legend-item">
-        <span className="legend-dot" style={{ background: '#ef4444' }}></span>
-        <span>&lt;50 (Low)</span>
-      </div>
-    </div>
-    <div className="legend-note">Marker size = passersby volume</div>
+    )}
   </div>
 );
 
 function InteractiveGeographicMap({ data, onLocationSelect, selectedLocation }) {
   const [hoveredLocation, setHoveredLocation] = useState(null);
+  const [showLegend, setShowLegend] = useState(true);
 
   const maxPassersby = Math.max(...data.map(d => d.passersby));
 
@@ -182,8 +208,8 @@ function InteractiveGeographicMap({ data, onLocationSelect, selectedLocation }) 
         />
       )}
 
-      {/* Legend */}
-      <MapLegend />
+      {/* Legend with Toggle */}
+      <MapLegend isVisible={showLegend} onToggle={() => setShowLegend(!showLegend)} />
     </div>
   );
 }
