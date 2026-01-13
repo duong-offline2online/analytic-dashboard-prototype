@@ -62,6 +62,28 @@ export const CAMPAIGNS = [
 ];
 
 export const generateRetailInsightsData = () => {
+  // Visitor Insights Time Series Data (with CV passerby data)
+  const generateVisitorInsightsData = () => {
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    return days.map(day => {
+      const visitors = Math.floor(Math.random() * 800) + 400; // Store visitors
+      const passerby = Math.floor(Math.random() * 5000) + 3000; // CV-detected passerby
+
+      return {
+        day,
+        visitors,
+        passerby,
+        passerbyMale: Math.floor(passerby * 0.52),
+        passerbyFemale: Math.floor(passerby * 0.48),
+        passerby18_24: Math.floor(passerby * 0.18),
+        passerby25_34: Math.floor(passerby * 0.28),
+        passerby35_44: Math.floor(passerby * 0.22),
+        passerby45_54: Math.floor(passerby * 0.18),
+        passerby55: Math.floor(passerby * 0.14),
+      };
+    });
+  };
+
   // Campaign Performance Time Series Data (by day)
   const generateCampaignTimeSeriesData = () => {
     const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -203,6 +225,9 @@ export const generateRetailInsightsData = () => {
   };
 
   return {
+    visitorInsights: {
+      timeSeriesData: generateVisitorInsightsData(),
+    },
     campaignPerformance: {
       summary: campaignSummary,
       timeSeriesData: generateCampaignTimeSeriesData(),

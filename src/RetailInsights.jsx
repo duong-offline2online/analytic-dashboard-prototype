@@ -22,6 +22,7 @@ function RetailInsights() {
   const [genderFilter, setGenderFilter] = React.useState('all');
   const [ageFilter, setAgeFilter] = React.useState('all');
   const [cvEnabled, setCvEnabled] = React.useState(true);
+  const [visitorViewMode, setVisitorViewMode] = React.useState('total'); // 'total', 'gender', 'age'
   const [sortConfig, setSortConfig] = React.useState({ key: 'passersby', direction: 'desc' });
   const [selectedMapLocation, setSelectedMapLocation] = React.useState(null);
   const [currentPage, setCurrentPage] = React.useState(1);
@@ -326,6 +327,19 @@ function RetailInsights() {
       {/* VISITOR INSIGHTS TAB */}
       {activeTab === 'visitor' && (
         <div className="tab-content">
+          {/* CV Toggle Control */}
+          <div className="chart-card full-width" style={{ marginBottom: '16px', padding: '12px 16px' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: '500', color: '#1f2937' }}>
+              <input
+                type="checkbox"
+                checked={cvEnabled}
+                onChange={(e) => setCvEnabled(e.target.checked)}
+                style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+              />
+              Enable Computer Vision Analysis
+            </label>
+          </div>
+
           {/* Stats */}
           <div className="metrics-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
             <div className="metric-card">
@@ -342,25 +356,139 @@ function RetailInsights() {
             </div>
           </div>
 
-          {/* Chart */}
+          {/* Chart - Visitors + Passerby with CV Toggle and View Mode Selection */}
           <div className="chart-card full-width">
             <div className="chart-header">
-              <h3>Visitor Stats (07 Jan - 13 Jan)</h3>
-              <div className="chart-legend">
-                <div className="legend-item">
-                  <div className="legend-dot" style={{ backgroundColor: '#3b82f6' }}></div>
-                  <span>Total Appointments</span>
+              <h3>Visitor Stats (07 Jan - 13 Jan) - Enhanced with CV Passerby Data</h3>
+              {cvEnabled && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <span style={{ fontSize: '13px', fontWeight: '500', color: '#6b7280' }}>View Mode:</span>
+                  <button
+                    className={`demo-filter-btn ${visitorViewMode === 'total' ? 'active' : ''}`}
+                    onClick={() => setVisitorViewMode('total')}
+                    style={{ fontSize: '13px' }}
+                  >
+                    Total Passerby
+                  </button>
+                  <button
+                    className={`demo-filter-btn ${visitorViewMode === 'gender' ? 'active' : ''}`}
+                    onClick={() => setVisitorViewMode('gender')}
+                    style={{ fontSize: '13px' }}
+                  >
+                    By Gender
+                  </button>
+                  <button
+                    className={`demo-filter-btn ${visitorViewMode === 'age' ? 'active' : ''}`}
+                    onClick={() => setVisitorViewMode('age')}
+                    style={{ fontSize: '13px' }}
+                  >
+                    By Age Range
+                  </button>
                 </div>
-                <div className="legend-item">
-                  <div className="legend-dot" style={{ backgroundColor: '#10b981' }}></div>
-                  <span>Total Walk-Ins (Queued)</span>
-                </div>
-              </div>
+              )}
             </div>
             <ResponsiveContainer width="100%" height={300}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#9ca3af', fontSize: '14px' }}>
-                No data available
-              </div>
+              {cvEnabled && mockData.visitorInsights ? (
+                <LineChart data={mockData.visitorInsights.timeSeriesData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis dataKey="day" stroke="#6b7280" tick={{ fontSize: 12 }} />
+                  <YAxis stroke="#6b7280" tick={{ fontSize: 12 }} />
+                  <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }} />
+                  <Legend />
+
+                  {/* Always show Store Visitors */}
+                  <Line
+                    type="monotone"
+                    dataKey="visitors"
+                    stroke="#6366f1"
+                    strokeWidth={2}
+                    name="Store Visitors"
+                    dot={{ r: 4 }}
+                  />
+
+                  {/* Show Total Passerby or Segmented Based on View Mode */}
+                  {visitorViewMode === 'total' && (
+                    <Line
+                      type="monotone"
+                      dataKey="passerby"
+                      stroke="#3b82f6"
+                      strokeWidth={2}
+                      name="Passerby Audience (CV)"
+                      dot={{ r: 4 }}
+                    />
+                  )}
+
+                  {visitorViewMode === 'gender' && (
+                    <>
+                      <Line
+                        type="monotone"
+                        dataKey="passerbyMale"
+                        stroke="#1d4ed8"
+                        strokeWidth={2}
+                        name="Male Passerby"
+                        dot={{ r: 4 }}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="passerbyFemale"
+                        stroke="#ec4899"
+                        strokeWidth={2}
+                        name="Female Passerby"
+                        dot={{ r: 4 }}
+                      />
+                    </>
+                  )}
+
+                  {visitorViewMode === 'age' && (
+                    <>
+                      <Line
+                        type="monotone"
+                        dataKey="passerby18_24"
+                        stroke="#dc2626"
+                        strokeWidth={1.5}
+                        name="18-24"
+                        dot={{ r: 3 }}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="passerby25_34"
+                        stroke="#f59e0b"
+                        strokeWidth={1.5}
+                        name="25-34"
+                        dot={{ r: 3 }}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="passerby35_44"
+                        stroke="#10b981"
+                        strokeWidth={1.5}
+                        name="35-44"
+                        dot={{ r: 3 }}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="passerby45_54"
+                        stroke="#3b82f6"
+                        strokeWidth={1.5}
+                        name="45-54"
+                        dot={{ r: 3 }}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="passerby55"
+                        stroke="#8b5cf6"
+                        strokeWidth={1.5}
+                        name="55+"
+                        dot={{ r: 3 }}
+                      />
+                    </>
+                  )}
+                </LineChart>
+              ) : (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#9ca3af', fontSize: '14px' }}>
+                  {cvEnabled ? 'Loading data...' : 'Enable Computer Vision to see passerby audience analysis'}
+                </div>
+              )}
             </ResponsiveContainer>
           </div>
         </div>
