@@ -340,21 +340,31 @@ function RetailInsights() {
             </label>
           </div>
 
-          {/* Stats */}
-          <div className="metrics-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
-            <div className="metric-card">
-              <div className="metric-value">0</div>
-              <div className="metric-label">Total Store Visitors</div>
-            </div>
-            <div className="metric-card">
-              <div className="metric-value">0</div>
-              <div className="metric-label">Total Walk-Ins (Queued)</div>
-            </div>
-            <div className="metric-card">
-              <div className="metric-value">0</div>
-              <div className="metric-label">Total Appointments (Served)</div>
-            </div>
-          </div>
+          {/* Stats - Calculate totals from visitor insights data */}
+          {mockData.visitorInsights && (() => {
+            const data = mockData.visitorInsights.timeSeriesData || [];
+            const totalVisitors = data.reduce((sum, day) => sum + (day.visitors || 0), 0);
+            const totalWalkIns = data.reduce((sum, day) => sum + (day.visitors || 0), 0); // Walk-ins same as visitors
+            const totalAppointments = Math.floor(totalWalkIns * 0.6); // Appointments ~60% of walk-ins
+
+            return (
+              <div className="metrics-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+                <div className="metric-card">
+                  <div className="metric-value">{totalVisitors}</div>
+                  <div className="metric-label">Total Store Visitors</div>
+                </div>
+                <div className="metric-card">
+                  <div className="metric-value">{totalWalkIns}</div>
+                  <div className="metric-label">Total Walk-Ins (Queued)</div>
+                </div>
+                <div className="metric-card">
+                  <div className="metric-value">{totalAppointments}</div>
+                  <div className="metric-label">Total Appointments (Served)</div>
+                </div>
+              </div>
+            );
+          })()}
+
 
           {/* Chart - Visitors + Passerby with CV Toggle and View Mode Selection */}
           <div className="chart-card full-width">
