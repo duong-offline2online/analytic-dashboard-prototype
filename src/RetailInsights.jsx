@@ -24,6 +24,8 @@ function RetailInsights() {
   const [cvEnabled, setCvEnabled] = React.useState(true);
   const [sortConfig, setSortConfig] = React.useState({ key: 'passersby', direction: 'desc' });
   const [selectedMapLocation, setSelectedMapLocation] = React.useState(null);
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const PAGE_SIZE = 10;
 
   const COLORS = {
     passersby: '#3b82f6',
@@ -139,6 +141,28 @@ function RetailInsights() {
       return sortConfig.direction === 'asc' ? aVal - bVal : bVal - aVal;
     });
     return sorted;
+  };
+
+  // Pagination helpers
+  const getPaginatedData = (data) => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    const end = start + PAGE_SIZE;
+    return data.slice(start, end);
+  };
+
+  const getTotalPages = (data) => Math.ceil(data.length / PAGE_SIZE);
+
+  // Reset page when filters change
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedBrand, selectedStore, selectedCampaign]);
+
+  // Find top performer
+  const getTopPerformer = (data) => {
+    if (data.length === 0) return null;
+    return data.reduce((max, item) =>
+      item.engagementScore > max.engagementScore ? item : max
+    , data[0]);
   };
 
   const handleSort = (key) => {
@@ -437,6 +461,25 @@ function RetailInsights() {
       {/* CAMPAIGN PERFORMANCE TAB */}
       {activeTab === 'campaign' && (
         <div className="tab-content">
+          {/* CV Toggle */}
+          <div className="cv-toggle-wrapper">
+            <label className="cv-toggle">
+              <input
+                type="checkbox"
+                checked={cvEnabled}
+                onChange={(e) => setCvEnabled(e.target.checked)}
+                aria-label="Enable Computer Vision analytics"
+              />
+              <span className="toggle-slider"></span>
+            </label>
+            <span className="cv-toggle-label">
+              Computer Vision {cvEnabled ? 'Enabled' : 'Disabled'}
+            </span>
+            {!cvEnabled && (
+              <span className="cv-hint">Enable for demographic insights</span>
+            )}
+          </div>
+
           {/* Summary Metrics */}
           <div className="metrics-grid">
             <div className="metric-card">
@@ -516,63 +559,65 @@ function RetailInsights() {
           <div className="chart-card full-width">
             <div className="chart-header">
               <h3>Passerby Audience & Campaign Engagement Over Time</h3>
-              <div className="demographic-filters">
-                <button
-                  className={`demo-filter-btn ${genderFilter === 'all' ? 'active' : ''}`}
-                  onClick={() => setGenderFilter('all')}
-                >
-                  All
-                </button>
-                <button
-                  className={`demo-filter-btn ${genderFilter === 'male' ? 'active' : ''}`}
-                  onClick={() => setGenderFilter('male')}
-                >
-                  Male
-                </button>
-                <button
-                  className={`demo-filter-btn ${genderFilter === 'female' ? 'active' : ''}`}
-                  onClick={() => setGenderFilter('female')}
-                >
-                  Female
-                </button>
-                <span style={{ margin: '0 8px', color: '#cbd5e0' }}>|</span>
-                <button
-                  className={`demo-filter-btn ${ageFilter === 'all' ? 'active' : ''}`}
-                  onClick={() => setAgeFilter('all')}
-                >
-                  All Ages
-                </button>
-                <button
-                  className={`demo-filter-btn ${ageFilter === '18-24' ? 'active' : ''}`}
-                  onClick={() => setAgeFilter('18-24')}
-                >
-                  18-24
-                </button>
-                <button
-                  className={`demo-filter-btn ${ageFilter === '25-34' ? 'active' : ''}`}
-                  onClick={() => setAgeFilter('25-34')}
-                >
-                  25-34
-                </button>
-                <button
-                  className={`demo-filter-btn ${ageFilter === '35-44' ? 'active' : ''}`}
-                  onClick={() => setAgeFilter('35-44')}
-                >
-                  35-44
-                </button>
-                <button
-                  className={`demo-filter-btn ${ageFilter === '45-54' ? 'active' : ''}`}
-                  onClick={() => setAgeFilter('45-54')}
-                >
-                  45-54
-                </button>
-                <button
-                  className={`demo-filter-btn ${ageFilter === '55+' ? 'active' : ''}`}
-                  onClick={() => setAgeFilter('55+')}
-                >
-                  55+
-                </button>
-              </div>
+              {cvEnabled && (
+                <div className="demographic-filters">
+                  <button
+                    className={`demo-filter-btn ${genderFilter === 'all' ? 'active' : ''}`}
+                    onClick={() => setGenderFilter('all')}
+                  >
+                    All
+                  </button>
+                  <button
+                    className={`demo-filter-btn ${genderFilter === 'male' ? 'active' : ''}`}
+                    onClick={() => setGenderFilter('male')}
+                  >
+                    Male
+                  </button>
+                  <button
+                    className={`demo-filter-btn ${genderFilter === 'female' ? 'active' : ''}`}
+                    onClick={() => setGenderFilter('female')}
+                  >
+                    Female
+                  </button>
+                  <span style={{ margin: '0 8px', color: '#cbd5e0' }}>|</span>
+                  <button
+                    className={`demo-filter-btn ${ageFilter === 'all' ? 'active' : ''}`}
+                    onClick={() => setAgeFilter('all')}
+                  >
+                    All Ages
+                  </button>
+                  <button
+                    className={`demo-filter-btn ${ageFilter === '18-24' ? 'active' : ''}`}
+                    onClick={() => setAgeFilter('18-24')}
+                  >
+                    18-24
+                  </button>
+                  <button
+                    className={`demo-filter-btn ${ageFilter === '25-34' ? 'active' : ''}`}
+                    onClick={() => setAgeFilter('25-34')}
+                  >
+                    25-34
+                  </button>
+                  <button
+                    className={`demo-filter-btn ${ageFilter === '35-44' ? 'active' : ''}`}
+                    onClick={() => setAgeFilter('35-44')}
+                  >
+                    35-44
+                  </button>
+                  <button
+                    className={`demo-filter-btn ${ageFilter === '45-54' ? 'active' : ''}`}
+                    onClick={() => setAgeFilter('45-54')}
+                  >
+                    45-54
+                  </button>
+                  <button
+                    className={`demo-filter-btn ${ageFilter === '55+' ? 'active' : ''}`}
+                    onClick={() => setAgeFilter('55+')}
+                  >
+                    55+
+                  </button>
+                </div>
+              )}
             </div>
             <ResponsiveContainer width="100%" height={350}>
               <LineChart data={getFilteredTimeSeriesData()}>
@@ -662,8 +707,11 @@ function RetailInsights() {
                   </tr>
                 </thead>
                 <tbody>
-                  {getSortedDisplayData().map((item, index) => (
-                    <tr key={index}>
+                  {getPaginatedData(getSortedDisplayData()).map((item, index) => {
+                    const topPerformer = getTopPerformer(filteredData.displayTypePerformance);
+                    const isTopPerformer = topPerformer && item.displayType === topPerformer.displayType;
+                    return (
+                    <tr key={index} className={isTopPerformer ? 'top-performer-row' : ''}>
                       <td>
                         <strong>{item.displayType}</strong>
                         <div className="table-subtitle">({item.count} displays)</div>
@@ -704,7 +752,8 @@ function RetailInsights() {
                         </div>
                       </td>
                     </tr>
-                  ))}
+                  );
+                  })}
                 </tbody>
               </table>
               {filteredData.displayTypePerformance.length === 0 && (
@@ -728,6 +777,29 @@ function RetailInsights() {
                     }}
                   >
                     Clear Filters
+                  </button>
+                </div>
+              )}
+              {getTotalPages(getSortedDisplayData()) > 1 && (
+                <div className="pagination">
+                  <button
+                    className="pagination-btn"
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                    aria-label="Previous page"
+                  >
+                    &larr; Prev
+                  </button>
+                  <div className="pagination-info">
+                    Page {currentPage} of {getTotalPages(getSortedDisplayData())}
+                  </div>
+                  <button
+                    className="pagination-btn"
+                    disabled={currentPage === getTotalPages(getSortedDisplayData())}
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                    aria-label="Next page"
+                  >
+                    Next &rarr;
                   </button>
                 </div>
               )}
