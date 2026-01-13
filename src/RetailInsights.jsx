@@ -7,7 +7,7 @@ import InteractiveGeographicMap from './components/interactive-geographic-map';
 import './App.css';
 
 function RetailInsights() {
-  const mockData = generateRetailInsightsData();
+  const mockData = React.useMemo(() => generateRetailInsightsData(), []);
   const [activeTab, setActiveTab] = React.useState('visitor'); // 'visitor', 'store', 'appointments', 'campaign'
   const [selectedDateRange, setSelectedDateRange] = React.useState('7days');
   const [dateBounds, setDateBounds] = React.useState(() => {
