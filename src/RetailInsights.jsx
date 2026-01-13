@@ -347,8 +347,8 @@ function RetailInsights() {
           {mockData.visitorInsights && (() => {
             const data = mockData.visitorInsights.timeSeriesData || [];
             const totalVisitors = data.reduce((sum, day) => sum + (day.visitors || 0), 0);
-            const totalWalkIns = data.reduce((sum, day) => sum + (day.visitors || 0), 0); // Walk-ins same as visitors
-            const totalAppointments = Math.floor(totalWalkIns * 0.6); // Appointments ~60% of walk-ins
+            const totalWalkIns = data.reduce((sum, day) => sum + (day.walkIns || 0), 0);
+            const totalAppointments = data.reduce((sum, day) => sum + (day.appointments || 0), 0);
 
             return (
               <div className="metrics-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
@@ -420,7 +420,7 @@ function RetailInsights() {
                   />
                   <Line
                     type="monotone"
-                    dataKey="visitors"
+                    dataKey="walkIns"
                     stroke="#10b981"
                     strokeWidth={2}
                     name="Total Walk-Ins (Queued)"
@@ -428,7 +428,7 @@ function RetailInsights() {
                   />
                   <Line
                     type="monotone"
-                    dataKey="visitors"
+                    dataKey="appointments"
                     stroke="#3b82f6"
                     strokeWidth={2}
                     name="Total Appointments (Served)"

@@ -66,12 +66,16 @@ export const generateRetailInsightsData = () => {
   const generateVisitorInsightsData = () => {
     const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     return days.map(day => {
-      const visitors = Math.floor(Math.random() * 800) + 400; // Store visitors
+      const visitors = Math.floor(Math.random() * 800) + 400; // Store visitors (total entries)
+      const walkIns = Math.floor(visitors * (0.65 + Math.random() * 0.15)); // Walk-Ins queued (~65-80% of visitors)
+      const appointments = Math.floor(visitors * (0.45 + Math.random() * 0.25)); // Appointments served (~45-70% of visitors)
       const passerby = Math.floor(Math.random() * 5000) + 3000; // CV-detected passerby
 
       return {
         day,
         visitors,
+        walkIns,
+        appointments,
         passerby,
         passerbyMale: Math.floor(passerby * 0.52),
         passerbyFemale: Math.floor(passerby * 0.48),
