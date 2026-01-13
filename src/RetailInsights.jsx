@@ -22,6 +22,7 @@ function RetailInsights() {
   const [genderFilter, setGenderFilter] = React.useState('all');
   const [ageFilter, setAgeFilter] = React.useState('all');
   const [cvEnabled, setCvEnabled] = React.useState(true);
+  const [passerbyViewMode, setPasserbyViewMode] = React.useState('gender'); // 'gender' or 'age'
   const [sortConfig, setSortConfig] = React.useState({ key: 'passersby', direction: 'desc' });
   const [selectedMapLocation, setSelectedMapLocation] = React.useState(null);
   const [currentPage, setCurrentPage] = React.useState(1);
@@ -372,6 +373,25 @@ function RetailInsights() {
           <div className="chart-card full-width">
             <div className="chart-header">
               <h3>Visitor Stats (07 Jan - 13 Jan){cvEnabled ? ' - Enhanced with CV Passerby Data' : ''}</h3>
+              {cvEnabled && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <span style={{ fontSize: '13px', fontWeight: '500', color: '#6b7280' }}>Passerby Breakdown:</span>
+                  <button
+                    className={`demo-filter-btn ${passerbyViewMode === 'gender' ? 'active' : ''}`}
+                    onClick={() => setPasserbyViewMode('gender')}
+                    style={{ fontSize: '13px' }}
+                  >
+                    By Gender
+                  </button>
+                  <button
+                    className={`demo-filter-btn ${passerbyViewMode === 'age' ? 'active' : ''}`}
+                    onClick={() => setPasserbyViewMode('age')}
+                    style={{ fontSize: '13px' }}
+                  >
+                    By Age Range
+                  </button>
+                </div>
+              )}
             </div>
             <ResponsiveContainer width="100%" height={300}>
               {mockData.visitorInsights ? (
@@ -409,9 +429,8 @@ function RetailInsights() {
                   />
 
                   {/* Show CV Passerby Breakdowns Only When Enabled */}
-                  {cvEnabled && (
+                  {cvEnabled && passerbyViewMode === 'gender' && (
                     <>
-                      {/* Gender Breakdown of Passerby */}
                       <Line
                         type="monotone"
                         dataKey="passerbyMale"
@@ -428,8 +447,11 @@ function RetailInsights() {
                         name="Female Passerby"
                         dot={{ r: 4 }}
                       />
+                    </>
+                  )}
 
-                      {/* Age Range Breakdown of Passerby */}
+                  {cvEnabled && passerbyViewMode === 'age' && (
+                    <>
                       <Line
                         type="monotone"
                         dataKey="passerby18_24"
