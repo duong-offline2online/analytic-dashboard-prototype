@@ -91,7 +91,7 @@ function InteractiveGeographicMap({ data, onLocationSelect, selectedLocation }) 
         projectionConfig={{ scale: 1500, center: [133, -27] }}
         style={{ width: '100%', height: '100%' }}
       >
-        <ZoomableGroup center={[133, -27]} zoom={1}>
+        <ZoomableGroup center={[133, -27]} zoom={1} minZoom={0.6} maxZoom={4}>
           {/* State outlines */}
           <Geographies geography={AU_GEO_URL}>
             {({ geographies }) =>
