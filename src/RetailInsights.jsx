@@ -327,17 +327,20 @@ function RetailInsights() {
       {/* VISITOR INSIGHTS TAB */}
       {activeTab === 'visitor' && (
         <div className="tab-content">
-          {/* CV Toggle Control */}
-          <div className="chart-card full-width" style={{ marginBottom: '16px', padding: '12px 16px' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: '500', color: '#1f2937' }}>
+          {/* CV Toggle Switch */}
+          <div className="cv-toggle-wrapper" style={{ marginBottom: '20px' }}>
+            <label className="cv-toggle">
               <input
                 type="checkbox"
                 checked={cvEnabled}
                 onChange={(e) => setCvEnabled(e.target.checked)}
-                style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                aria-label="Enable Computer Vision analytics"
               />
-              Enable Computer Vision Analysis
+              <span className="toggle-slider"></span>
             </label>
+            <span className="cv-toggle-label">
+              Computer Vision {cvEnabled ? 'Enabled' : 'Disabled'}
+            </span>
           </div>
 
           {/* Stats - Calculate totals from visitor insights data */}
@@ -369,7 +372,7 @@ function RetailInsights() {
           {/* Chart - Visitors + Passerby with CV Toggle and View Mode Selection */}
           <div className="chart-card full-width">
             <div className="chart-header">
-              <h3>Visitor Stats (07 Jan - 13 Jan) - Enhanced with CV Passerby Data</h3>
+              <h3>Visitor Stats (07 Jan - 13 Jan){cvEnabled ? ' - Enhanced with CV Passerby Data' : ''}</h3>
               {cvEnabled && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <span style={{ fontSize: '13px', fontWeight: '500', color: '#6b7280' }}>View Mode:</span>
@@ -398,7 +401,7 @@ function RetailInsights() {
               )}
             </div>
             <ResponsiveContainer width="100%" height={300}>
-              {cvEnabled && mockData.visitorInsights ? (
+              {mockData.visitorInsights ? (
                 <LineChart data={mockData.visitorInsights.timeSeriesData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                   <XAxis dataKey="day" stroke="#6b7280" tick={{ fontSize: 12 }} />
@@ -406,7 +409,7 @@ function RetailInsights() {
                   <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }} />
                   <Legend />
 
-                  {/* Always show Store Visitors */}
+                  {/* Always show Store Visitors, Walk-Ins, and Appointments */}
                   <Line
                     type="monotone"
                     dataKey="visitors"
@@ -415,88 +418,108 @@ function RetailInsights() {
                     name="Store Visitors"
                     dot={{ r: 4 }}
                   />
+                  <Line
+                    type="monotone"
+                    dataKey="visitors"
+                    stroke="#10b981"
+                    strokeWidth={2}
+                    name="Total Walk-Ins (Queued)"
+                    dot={{ r: 4 }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="visitors"
+                    stroke="#3b82f6"
+                    strokeWidth={2}
+                    name="Total Appointments (Served)"
+                    dot={{ r: 4 }}
+                  />
 
-                  {/* Show Total Passerby or Segmented Based on View Mode */}
-                  {visitorViewMode === 'total' && (
-                    <Line
-                      type="monotone"
-                      dataKey="passerby"
-                      stroke="#3b82f6"
-                      strokeWidth={2}
-                      name="Passerby Audience (CV)"
-                      dot={{ r: 4 }}
-                    />
-                  )}
-
-                  {visitorViewMode === 'gender' && (
+                  {/* Show CV Passerby Data Only When Enabled */}
+                  {cvEnabled && (
                     <>
-                      <Line
-                        type="monotone"
-                        dataKey="passerbyMale"
-                        stroke="#1d4ed8"
-                        strokeWidth={2}
-                        name="Male Passerby"
-                        dot={{ r: 4 }}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="passerbyFemale"
-                        stroke="#ec4899"
-                        strokeWidth={2}
-                        name="Female Passerby"
-                        dot={{ r: 4 }}
-                      />
-                    </>
-                  )}
+                      {visitorViewMode === 'total' && (
+                        <Line
+                          type="monotone"
+                          dataKey="passerby"
+                          stroke="#f59e0b"
+                          strokeWidth={2}
+                          name="Passerby Audience (CV)"
+                          dot={{ r: 4 }}
+                        />
+                      )}
 
-                  {visitorViewMode === 'age' && (
-                    <>
-                      <Line
-                        type="monotone"
-                        dataKey="passerby18_24"
-                        stroke="#dc2626"
-                        strokeWidth={1.5}
-                        name="18-24"
-                        dot={{ r: 3 }}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="passerby25_34"
-                        stroke="#f59e0b"
-                        strokeWidth={1.5}
-                        name="25-34"
-                        dot={{ r: 3 }}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="passerby35_44"
-                        stroke="#10b981"
-                        strokeWidth={1.5}
-                        name="35-44"
-                        dot={{ r: 3 }}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="passerby45_54"
-                        stroke="#3b82f6"
-                        strokeWidth={1.5}
-                        name="45-54"
-                        dot={{ r: 3 }}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="passerby55"
-                        stroke="#8b5cf6"
-                        strokeWidth={1.5}
-                        name="55+"
-                        dot={{ r: 3 }}
-                      />
+                      {visitorViewMode === 'gender' && (
+                        <>
+                          <Line
+                            type="monotone"
+                            dataKey="passerbyMale"
+                            stroke="#1d4ed8"
+                            strokeWidth={2}
+                            name="Male Passerby"
+                            dot={{ r: 4 }}
+                          />
+                          <Line
+                            type="monotone"
+                            dataKey="passerbyFemale"
+                            stroke="#ec4899"
+                            strokeWidth={2}
+                            name="Female Passerby"
+                            dot={{ r: 4 }}
+                          />
+                        </>
+                      )}
+
+                      {visitorViewMode === 'age' && (
+                        <>
+                          <Line
+                            type="monotone"
+                            dataKey="passerby18_24"
+                            stroke="#dc2626"
+                            strokeWidth={1.5}
+                            name="18-24"
+                            dot={{ r: 3 }}
+                          />
+                          <Line
+                            type="monotone"
+                            dataKey="passerby25_34"
+                            stroke="#f59e0b"
+                            strokeWidth={1.5}
+                            name="25-34"
+                            dot={{ r: 3 }}
+                          />
+                          <Line
+                            type="monotone"
+                            dataKey="passerby35_44"
+                            stroke="#10b981"
+                            strokeWidth={1.5}
+                            name="35-44"
+                            dot={{ r: 3 }}
+                          />
+                          <Line
+                            type="monotone"
+                            dataKey="passerby45_54"
+                            stroke="#06b6d4"
+                            strokeWidth={1.5}
+                            name="45-54"
+                            dot={{ r: 3 }}
+                          />
+                          <Line
+                            type="monotone"
+                            dataKey="passerby55"
+                            stroke="#8b5cf6"
+                            strokeWidth={1.5}
+                            name="55+"
+                            dot={{ r: 3 }}
+                          />
+                        </>
+                      )}
                     </>
                   )}
                 </LineChart>
               ) : (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#9ca3af', fontSize: '14px' }}>
-                  {cvEnabled ? 'Loading data...' : 'Enable Computer Vision to see passerby audience analysis'}
+                  Loading data...
                 </div>
               )}
             </ResponsiveContainer>
