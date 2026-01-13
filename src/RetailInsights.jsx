@@ -1,13 +1,21 @@
 import React from 'react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Users, Clock, Play, Eye, Award, TrendingUp, Calendar, Target, RefreshCw, Download, MapPin, Filter as FilterIcon } from 'lucide-react';
-import { generateRetailInsightsData } from './retailInsightsData';
+import { generateRetailInsightsData, BRANDS, STORES, CAMPAIGNS, calculateEngagementScore } from './retailInsightsData';
+import { TimePeriodSelector } from './components/time-period-selector';
+import InteractiveGeographicMap from './components/interactive-geographic-map';
 import './App.css';
 
 function RetailInsights() {
   const mockData = generateRetailInsightsData();
   const [activeTab, setActiveTab] = React.useState('visitor'); // 'visitor', 'store', 'appointments', 'campaign'
   const [selectedDateRange, setSelectedDateRange] = React.useState('7days');
+  const [dateBounds, setDateBounds] = React.useState(() => {
+    const today = new Date();
+    const start = new Date(today);
+    start.setDate(start.getDate() - 6);
+    return { start, end: today };
+  });
   const [selectedBrand, setSelectedBrand] = React.useState('all');
   const [selectedStore, setSelectedStore] = React.useState('all');
   const [selectedCampaign, setSelectedCampaign] = React.useState('all');
@@ -15,6 +23,7 @@ function RetailInsights() {
   const [ageFilter, setAgeFilter] = React.useState('all');
   const [cvEnabled, setCvEnabled] = React.useState(true);
   const [sortConfig, setSortConfig] = React.useState({ key: 'passersby', direction: 'desc' });
+  const [selectedMapLocation, setSelectedMapLocation] = React.useState(null);
 
   const COLORS = {
     passersby: '#3b82f6',
@@ -23,6 +32,75 @@ function RetailInsights() {
     views: '#ec4899',
     engagement: '#8b5cf6',
   };
+
+  // Calculate summary from filtered display data
+  const calculateSummary = (displayData) => {
+    if (displayData.length === 0) {
+      return {
+        totalPassersby: 0,
+        totalPlaybackDuration: 0,
+        totalPlaybackCount: 0,
+        totalViews: 0,
+        avgViewDuration: 0,
+        engagementScore: 0,
+      };
+    }
+
+    const totals = displayData.reduce((acc, item) => ({
+      passersby: acc.passersby + item.passersby,
+      playbackDuration: acc.playbackDuration + item.playbackDuration,
+      playbackCount: acc.playbackCount + item.playbackCount,
+      views: acc.views + item.views,
+    }), { passersby: 0, playbackDuration: 0, playbackCount: 0, views: 0 });
+
+    // Calculate overall engagement score from totals
+    const avgViewDuration = 3.8; // Average across displays
+    const engagementScore = calculateEngagementScore({
+      passersby: totals.passersby,
+      views: totals.views,
+      avgViewDuration,
+      playbackCount: totals.playbackCount,
+    });
+
+    return {
+      totalPassersby: totals.passersby,
+      totalPlaybackDuration: totals.playbackDuration,
+      totalPlaybackCount: totals.playbackCount,
+      totalViews: totals.views,
+      avgViewDuration,
+      engagementScore,
+    };
+  };
+
+  // Filter data based on selected filters
+  const filteredData = React.useMemo(() => {
+    const raw = mockData.campaignPerformance;
+
+    // Filter display performance
+    const filteredDisplays = raw.displayTypePerformance.filter(item => {
+      if (selectedBrand !== 'all' && item.brandId !== selectedBrand) return false;
+      if (selectedStore !== 'all' && item.storeId !== selectedStore) return false;
+      if (selectedCampaign !== 'all' && item.campaignId !== selectedCampaign) return false;
+      return true;
+    });
+
+    // Filter location performance
+    const filteredLocations = raw.locationPerformance.filter(item => {
+      if (selectedStore !== 'all' && !item.storeIds?.includes(selectedStore)) return false;
+      if (selectedBrand !== 'all' && !item.brandIds?.includes(selectedBrand)) return false;
+      return true;
+    });
+
+    // Recalculate summary from filtered data
+    const summary = calculateSummary(filteredDisplays);
+
+    return {
+      summary,
+      timeSeriesData: raw.timeSeriesData,
+      displayTypePerformance: filteredDisplays,
+      locationPerformance: filteredLocations,
+    };
+  }, [mockData, selectedBrand, selectedStore, selectedCampaign]);
 
   // Filter time series data based on demographic filters
   const getFilteredTimeSeriesData = () => {
@@ -53,14 +131,14 @@ function RetailInsights() {
   };
 
   // Sort display type data
-  const getSortedDisplayData = () => {
-    const data = [...mockData.campaignPerformance.displayTypePerformance];
-    data.sort((a, b) => {
+  const getSortedDisplayData = (data = filteredData.displayTypePerformance) => {
+    const sorted = [...data];
+    sorted.sort((a, b) => {
       const aVal = a[sortConfig.key];
       const bVal = b[sortConfig.key];
       return sortConfig.direction === 'asc' ? aVal - bVal : bVal - aVal;
     });
-    return data;
+    return sorted;
   };
 
   const handleSort = (key) => {
@@ -85,22 +163,22 @@ function RetailInsights() {
 
       {/* Date Range and Filters */}
       <div className="filters">
-        <div className="filter-group date-range-picker">
-          {activeTab === 'appointments' ? (
-            <>
-              <span style={{ fontSize: '13px', color: '#374151' }}>14 Jan, 2026</span>
-              <span style={{ margin: '0 4px', color: '#9ca3af' }}>→</span>
-              <span style={{ fontSize: '13px', color: '#374151' }}>20 Jan, 2026</span>
-            </>
-          ) : (
-            <>
-              <span style={{ fontSize: '13px', color: '#374151' }}>07 Jan, 2026</span>
-              <span style={{ margin: '0 4px', color: '#9ca3af' }}>→</span>
-              <span style={{ fontSize: '13px', color: '#374151' }}>13 Jan, 2026</span>
-            </>
-          )}
-          <Calendar size={16} style={{ marginLeft: '4px', color: '#9ca3af' }} />
-        </div>
+        {activeTab === 'appointments' ? (
+          <div className="filter-group date-range-picker">
+            <span style={{ fontSize: '13px', color: '#374151' }}>14 Jan, 2026</span>
+            <span style={{ margin: '0 4px', color: '#9ca3af' }}>→</span>
+            <span style={{ fontSize: '13px', color: '#374151' }}>20 Jan, 2026</span>
+            <Calendar size={16} style={{ marginLeft: '4px', color: '#9ca3af' }} />
+          </div>
+        ) : (
+          <TimePeriodSelector
+            value={selectedDateRange}
+            onChange={(range, dates) => {
+              setSelectedDateRange(range);
+              setDateBounds(dates);
+            }}
+          />
+        )}
 
         {activeTab === 'visitor' && (
           <>
@@ -146,27 +224,27 @@ function RetailInsights() {
               <TrendingUp size={18} />
               <select value={selectedBrand} onChange={(e) => setSelectedBrand(e.target.value)}>
                 <option value="all">All Brands/Advertisers</option>
-                <option value="brand1">Nike</option>
-                <option value="brand2">Adidas</option>
-                <option value="brand3">Coca-Cola</option>
+                {BRANDS.map(b => (
+                  <option key={b.id} value={b.id}>{b.name}</option>
+                ))}
               </select>
             </div>
             <div className="filter-group">
               <MapPin size={18} />
               <select value={selectedStore} onChange={(e) => setSelectedStore(e.target.value)}>
                 <option value="all">All Stores</option>
-                <option value="store1">Flagship Store</option>
-                <option value="store2">Central Mall</option>
-                <option value="store3">Downtown Store</option>
+                {STORES.map(s => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
               </select>
             </div>
             <div className="filter-group">
               <Target size={18} />
               <select value={selectedCampaign} onChange={(e) => setSelectedCampaign(e.target.value)}>
                 <option value="all">All Campaigns</option>
-                <option value="camp1">Summer Sale 2025</option>
-                <option value="camp2">New Product Launch</option>
-                <option value="camp3">Holiday Special</option>
+                {CAMPAIGNS.map(c => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
               </select>
             </div>
           </>
@@ -366,7 +444,7 @@ function RetailInsights() {
                 <span className="metric-label">Total Passerby Audience</span>
                 <Users size={20} className="metric-icon" style={{ color: COLORS.passersby }} />
               </div>
-              <div className="metric-value">{mockData.campaignPerformance.summary.totalPassersby.toLocaleString()}</div>
+              <div className="metric-value">{filteredData.summary.totalPassersby.toLocaleString()}</div>
               <div className="metric-footer">
                 <span className="metric-change positive">+12.5%</span>
                 <span className="metric-subtitle">vs. last period</span>
@@ -378,7 +456,7 @@ function RetailInsights() {
                 <span className="metric-label">Total Campaign Playback Duration</span>
                 <Clock size={20} className="metric-icon" style={{ color: COLORS.playbackDuration }} />
               </div>
-              <div className="metric-value">{(mockData.campaignPerformance.summary.totalPlaybackDuration / 3600).toFixed(0)}h</div>
+              <div className="metric-value">{(filteredData.summary.totalPlaybackDuration / 3600).toFixed(0)}h</div>
               <div className="metric-footer">
                 <span className="metric-change positive">+8.3%</span>
                 <span className="metric-subtitle">Cumulative across displays</span>
@@ -390,7 +468,7 @@ function RetailInsights() {
                 <span className="metric-label">Total Campaign Playback Count</span>
                 <Play size={20} className="metric-icon" style={{ color: COLORS.playbackCount }} />
               </div>
-              <div className="metric-value">{mockData.campaignPerformance.summary.totalPlaybackCount.toLocaleString()}</div>
+              <div className="metric-value">{filteredData.summary.totalPlaybackCount.toLocaleString()}</div>
               <div className="metric-footer">
                 <span className="metric-change positive">+15.2%</span>
                 <span className="metric-subtitle">Times campaign played</span>
@@ -402,7 +480,7 @@ function RetailInsights() {
                 <span className="metric-label">Total Campaign Views</span>
                 <Eye size={20} className="metric-icon" style={{ color: COLORS.views }} />
               </div>
-              <div className="metric-value">{mockData.campaignPerformance.summary.totalViews.toLocaleString()}</div>
+              <div className="metric-value">{filteredData.summary.totalViews.toLocaleString()}</div>
               <div className="metric-footer">
                 <span className="metric-change positive">+18.7%</span>
                 <span className="metric-subtitle">Confirmed views</span>
@@ -414,7 +492,7 @@ function RetailInsights() {
                 <span className="metric-label">Average View Duration</span>
                 <Clock size={20} className="metric-icon" style={{ color: COLORS.engagement }} />
               </div>
-              <div className="metric-value">{mockData.campaignPerformance.summary.avgViewDuration}s</div>
+              <div className="metric-value">{filteredData.summary.avgViewDuration}s</div>
               <div className="metric-footer">
                 <span className="metric-change positive">+0.4s</span>
                 <span className="metric-subtitle">Per campaign view</span>
@@ -426,7 +504,7 @@ function RetailInsights() {
                 <span className="metric-label">Engagement Score</span>
                 <Award size={20} className="metric-icon" style={{ color: '#14b8a6' }} />
               </div>
-              <div className="metric-value">{mockData.campaignPerformance.summary.engagementScore}</div>
+              <div className="metric-value">{filteredData.summary.engagementScore}</div>
               <div className="metric-footer">
                 <span className="metric-change positive">+3 pts</span>
                 <span className="metric-subtitle">Excellent performance</span>
@@ -629,6 +707,30 @@ function RetailInsights() {
                   ))}
                 </tbody>
               </table>
+              {filteredData.displayTypePerformance.length === 0 && (
+                <div className="filter-empty-state">
+                  <p>No data matches the selected filters.</p>
+                  <button
+                    onClick={() => {
+                      setSelectedBrand('all');
+                      setSelectedStore('all');
+                      setSelectedCampaign('all');
+                    }}
+                    style={{
+                      padding: '8px 16px',
+                      background: '#3b82f6',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                      marginTop: '12px'
+                    }}
+                  >
+                    Clear Filters
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 
@@ -638,11 +740,11 @@ function RetailInsights() {
               <h3>Performance By State/Location</h3>
             </div>
             <div className="location-performance">
-              <div className="map-placeholder">
-                <MapPin size={48} style={{ color: '#cbd5e0' }} />
-                <p>Interactive Map</p>
-                <p className="map-subtitle">Markers sized by passerby volume, colored by engagement score</p>
-              </div>
+              <InteractiveGeographicMap
+                data={filteredData.locationPerformance}
+                onLocationSelect={(state) => setSelectedMapLocation(state)}
+                selectedLocation={selectedMapLocation}
+              />
               <div className="location-table">
                 <table>
                   <thead>
@@ -653,8 +755,12 @@ function RetailInsights() {
                     </tr>
                   </thead>
                   <tbody>
-                    {mockData.campaignPerformance.locationPerformance.map((item, index) => (
-                      <tr key={index}>
+                    {filteredData.locationPerformance.map((item, index) => (
+                      <tr
+                        key={index}
+                        className={selectedMapLocation === item.state ? 'selected-row' : ''}
+                        onClick={() => setSelectedMapLocation(item.state)}
+                      >
                         <td>
                           <strong>{item.state}</strong>
                           <div className="table-subtitle">{item.storeCount} stores</div>
