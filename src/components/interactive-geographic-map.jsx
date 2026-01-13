@@ -95,26 +95,35 @@ function InteractiveGeographicMap({ data, onLocationSelect, selectedLocation }) 
           {/* State outlines */}
           <Geographies geography={AU_GEO_URL}>
             {({ geographies }) =>
-              geographies
-                .filter(geo => {
-                  // Only show Australia (filter out other countries)
-                  const props = geo.properties;
-                  return props && (props.ADMIN === 'Australia' || props.name === 'Australia' || geo.id === 'AUS');
-                })
-                .map((geo) => (
-                <Geography
-                  key={geo.rsmKey}
-                  geography={geo}
-                  fill="#e5e7eb"
-                  stroke="#9ca3af"
-                  strokeWidth={1}
-                  style={{
-                    default: { outline: 'none', fill: '#e5e7eb' },
-                    hover: { fill: '#d1d5db', outline: 'none' },
-                    pressed: { outline: 'none' },
-                  }}
-                />
-              ))
+              geographies.map((geo) => {
+                // Filter to show only Australia - check multiple property names
+                const props = geo.properties;
+                const isAustralia = props && (
+                  props.ADMIN === 'Australia' ||
+                  props.admin === 'Australia' ||
+                  props.name === 'Australia' ||
+                  props.NAME === 'Australia' ||
+                  (geo.id && String(geo.id).includes('AUS')) ||
+                  !props.ADMIN // If no ADMIN property, assume it's Australia (from au-states GeoJSON)
+                );
+
+                if (!isAustralia) return null;
+
+                return (
+                  <Geography
+                    key={geo.rsmKey}
+                    geography={geo}
+                    fill="#e5e7eb"
+                    stroke="#9ca3af"
+                    strokeWidth={1}
+                    style={{
+                      default: { outline: 'none', fill: '#e5e7eb' },
+                      hover: { fill: '#d1d5db', outline: 'none' },
+                      pressed: { outline: 'none' },
+                    }}
+                  />
+                );
+              })
             }
           </Geographies>
 
