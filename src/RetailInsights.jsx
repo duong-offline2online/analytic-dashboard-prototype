@@ -312,15 +312,24 @@ function RetailInsights() {
         )}
 
         {activeTab === 'visitor' && (
-          <div className="filter-group">
-            <MapPin size={18} />
-            <select value={selectedStore} onChange={(e) => setSelectedStore(e.target.value)}>
-              <option value="all">All Stores</option>
-              {STORES.map(s => (
-                <option key={s.id} value={s.id}>{s.name}</option>
-              ))}
-            </select>
-          </div>
+          <>
+            <div className="filter-group">
+              <MapPin size={18} />
+              <select value={selectedStore} onChange={(e) => setSelectedStore(e.target.value)}>
+                <option value="all">All Stores</option>
+                {STORES.map(s => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+              </select>
+            </div>
+            <div className="filter-group">
+              <select defaultValue="all">
+                <option value="all">All Categories</option>
+                <option value="cat1">Category 1</option>
+                <option value="cat2">Category 2</option>
+              </select>
+            </div>
+          </>
         )}
 
         <button className="btn-secondary">
