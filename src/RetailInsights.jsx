@@ -21,7 +21,7 @@ function RetailInsights() {
   const [selectedCampaign, setSelectedCampaign] = React.useState('all');
   const [genderFilter, setGenderFilter] = React.useState('all');
   const [ageFilter, setAgeFilter] = React.useState('all');
-  const [cvEnabled, setCvEnabled] = React.useState(true);
+  const [cvEnabled, setCvEnabled] = React.useState(false);
   const [sortConfig, setSortConfig] = React.useState({ key: 'passersby', direction: 'desc' });
   const [selectedMapLocation, setSelectedMapLocation] = React.useState(null);
   const [currentPage, setCurrentPage] = React.useState(1);
