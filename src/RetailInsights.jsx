@@ -479,15 +479,7 @@ function RetailInsights() {
                   <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }} />
                   <Legend />
 
-                  {/* Always show Store Visitors, Walk-Ins, and Appointments */}
-                  <Line
-                    type="monotone"
-                    dataKey="visitors"
-                    stroke="#6366f1"
-                    strokeWidth={2}
-                    name="Store Visitors"
-                    dot={{ r: 4 }}
-                  />
+                  {/* Always show Walk-Ins and Appointments */}
                   <Line
                     type="monotone"
                     dataKey="walkIns"
